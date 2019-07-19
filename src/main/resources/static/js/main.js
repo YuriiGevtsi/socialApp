@@ -1,30 +1,20 @@
+import Vue from 'vue'
+import Vuetify from 'vuetify'
+import '@babel/polyfill'
+import 'api/resource'
+import App from 'pages/App.vue'
+import store from 'store/store'
+import { connect} from "./util/ws"
+import 'vuetify/dist/vuetify.min.css'
 
-var messageApi = Vue.resource('/message{/id}');
+if (frontendData.profile) {
+    connect()
+}
 
-Vue.component('message-row',{
-    props: ['message'],
-    template: '<div><i>({{ message.id }})</i>{{ message.text }}</div>'
-});
+Vue.use(Vuetify);
 
-Vue.component('messages-list', {
-    props: ['messages'],
-    template :
-        '<div>'+
-            '<message-row v-for="message in messages" :key="message.id" :message="message"/>'+'' +
-        '</div>',
-    created: function () {
-        messageApi.get().then(result =>
-            result.json().then(data  =>
-                data.forEach(message => this.messages.push(message))
-            )
-        )
-    }
-});
-
-var app = new Vue({
+new Vue({
     el: '#app',
-    template: '<messages-list :messages="messages" />',
-    data: {
-        messages: []
-    }
+    store,
+    render: a=>a(App)
 });
