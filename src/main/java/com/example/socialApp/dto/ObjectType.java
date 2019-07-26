@@ -1,5 +1,5 @@
 package com.example.socialApp.dto;
 
 public enum ObjectType {
-    MESSAGE
+    MESSAGE, COMMENT
 }

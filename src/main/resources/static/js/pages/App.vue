@@ -2,36 +2,45 @@
     <v-app>
         <v-toolbar app>
             <v-toolbar-title>SocialApp</v-toolbar-title>
+            <v-btn flat v-if="profile" :disabled="$route.path === '/'" @click="showMessages">
+                Messages
+            </v-btn>
             <v-spacer></v-spacer>
-            <span v-if="profile">{{profile.name}}</span>
+            <v-btn flat v-if="profile" :disabled="$route.path === '/user'" @click="showProfile">
+                {{profile.name}}
+            </v-btn>
             <v-btn v-if="profile" icon href="/logout">
                 <v-icon>exit_to_app</v-icon>
             </v-btn>
         </v-toolbar>
         <v-content>
-            <v-container v-if="!profile">Please authorize by
-                <a href="/login">Google</a>
-            </v-container>
-            <v-container v-if="profile">
-                <messages-list />
-            </v-container>
+            <router-view></router-view>
         </v-content>
     </v-app>
 </template>
 
 <script>
-    import { mapState, mapMutations } from 'vuex'
-    import MessagesList from 'components/messages/MessageList.vue'
-    import { addHandler } from "util/ws";
+    import {mapMutations, mapState} from 'vuex'
+    import {addHandler} from "util/ws";
 
     export default {
-        components: {
-            MessagesList
-        },
         computed: mapState(['profile']),
-        methods: mapMutations(['addMessageMutation','updateMessageMutation','removeMessageMutation']),
+        methods: {
+            ...mapMutations([
+                'addMessageMutation',
+                'updateMessageMutation',
+                'removeMessageMutation',
+                'addCommentMutation'
+            ]),
+            showMessages(){
+                this.$router.push('/')
+            },
+            showProfile(){
+                this.$router.push('/user')
+            }
+        },
         created(){
-            addHandler(data=>{
+            addHandler(data=> {
                 if (data.objectType === 'MESSAGE') {
                     switch (data.eventType) {
                         case 'CREATE':
@@ -46,11 +55,23 @@
                         default:
                             console.error(`Looks like the event type is unknown "${data.eventType}"`)
                     }
-                }else {
+                } else if (data.objectType === 'COMMENT') {
+                    switch (data.eventType) {
+                        case 'CREATE':
+                            this.addCommentMutation(data.body);
+                            break;
+                        default:
+                            console.error(`Looks like the event type is unknown "${data.eventType}"`)
+                    }
+                } else {
                     console.error(`Looks like the object type is unknown "${data.objectType}"`)
-
                 }
             })
+        },
+        beforeMount(){
+            if (!this.profile){
+                this.$router.replace('/auth')
+            }
         }
     }
 </script>
