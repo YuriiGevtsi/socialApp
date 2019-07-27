@@ -3,18 +3,21 @@ package com.example.socialApp.domain;
 import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
+import java.io.Serializable;
 
 @Entity
 @Data
 @EqualsAndHashCode(of = "id")
 @ToString(of = "id")
-public class UserSubscription {
+@NoArgsConstructor
+public class UserSubscription implements Serializable {
     @EmbeddedId
     @JsonIgnore
     private UserSubscriptionId id;

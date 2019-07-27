@@ -8,14 +8,8 @@
     <title>SocialApp</title>
     <script th:inline="javascript">
         let frontendData = [[${frontendData}]];
-        let messages = [# th;
-        :
-        utext = "${messages}" /;
-        ]
-        let profile = [# th;
-        :
-        utext = "${profile}" /;
-        ]
+        let messages = [# th:utext="${messages}" /];
+        let profile = [# th:utext="${profile}" /];
     </script>
 </head>
 <body>
