@@ -28,6 +28,13 @@
                 >
                     {{isISubscribed ? 'Unsubscribe' : 'Subscribe'}}
                 </v-btn>
+                <v-switch v-else
+                          v-model="profile.publicAccount"
+                          inset
+                          color="indigo"
+                          :label="profile.publicAccount ? 'Public' : 'Privat'"
+                          @change="changeAccountStatus">
+                </v-switch>
             </v-flex>
         </v-layout>
     </v-container>
@@ -63,6 +70,10 @@
         methods:{
             async changeSubscriptions(){
                 const data = await profileApi.changeSubscriptions(this.profile.id);
+                this.profile = await data.json()
+            },
+            async changeAccountStatus(){
+                const data = await profileApi.changeAccountStatus(this.profile.id);
                 this.profile = await data.json()
             },
             async updateProfile(){

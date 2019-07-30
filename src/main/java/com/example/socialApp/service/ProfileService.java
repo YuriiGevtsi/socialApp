@@ -49,4 +49,9 @@ public class ProfileService {
 
         return userSubscriptionRepo.save(subscription);
     }
+
+    public User changeAccountStatus(User user) {
+        user.setPublicAccount(!user.isPublicAccount());
+        return userDetailsRepo.save(user);
+    }
 }

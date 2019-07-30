@@ -57,5 +57,14 @@ public class ProfileController {
         return profileService.changeSubscriptionStatus(channel,subscriber);
     }
 
+    @PostMapping("change-account-status/{userId}")
+    @JsonView(Views.IdName.class)
+    public User changeAccountStatus(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable("userId") String userId
+    ){
+        if (currentUser.getId().equals(userId)) return profileService.changeAccountStatus(currentUser);
+        else return currentUser;
+    }
 
 }

@@ -11,8 +11,8 @@
         </v-card-text>
         <media v-if="message.link" :message="message"></media>
         <v-card-actions>
-            <v-btn value="Edit" @click="edit" small flat round> Edit</v-btn>
-            <v-btn icon @click="del" small>
+            <v-btn v-if="isMyMessage" value="Edit" @click="edit" small flat round> Edit</v-btn>
+            <v-btn v-if="isMyMessage" icon @click="del" small>
                 <v-icon>delete</v-icon>
             </v-btn>
         </v-card-actions>
@@ -39,6 +39,11 @@
             },
             del() {
                 this.removeMessageAction(this.message)
+            }
+        },
+        computed:{
+            isMyMessage(){
+                return this.message.author.id === this.$store.state.profile.id
             }
         }
     }

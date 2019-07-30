@@ -9,6 +9,7 @@ import com.example.socialApp.dto.MessagePageDto;
 import com.example.socialApp.dto.MetaDto;
 import com.example.socialApp.dto.ObjectType;
 import com.example.socialApp.repo.MessageRepo;
+import com.example.socialApp.repo.UserDetailsRepo;
 import com.example.socialApp.repo.UserSubscriptionRepo;
 import com.example.socialApp.util.WsSender;
 import org.jsoup.Jsoup;
@@ -39,17 +40,20 @@ public class MessageService {
     private final MessageRepo messageRepo;
     private final BiConsumer<EventType,Message> wsSender;
     private final UserSubscriptionRepo userSubscriptionRepo;
+    private final UserDetailsRepo userDetailsRepo;
 
 
     @Autowired
     public MessageService(
             MessageRepo messageRepo,
             WsSender wsSender,
-            UserSubscriptionRepo userSubscriptionRepo
+            UserSubscriptionRepo userSubscriptionRepo,
+            UserDetailsRepo userDetailsRepo
     ) {
         this.messageRepo = messageRepo;
         this.wsSender = wsSender.getSender(ObjectType.MESSAGE, Views.FullMessage.class);
         this.userSubscriptionRepo = userSubscriptionRepo;
+        this.userDetailsRepo = userDetailsRepo;
     }
 
     private void fillMeta(Message message) throws IOException {
@@ -120,11 +124,10 @@ public class MessageService {
     public MessagePageDto findForUser(Pageable pageable, User user) {
         List<User> channels = userSubscriptionRepo.findBySubscriber(user)
                 .stream()
-                .filter(UserSubscription::isActive)
+                .filter(u->(u.isActive() || userDetailsRepo.findById(u.getChannel().getId()).get().isPublicAccount()))
                 .map(UserSubscription::getChannel)
                 .collect(Collectors.toList());
-
-        channels.add(user);
+       channels.add(user);
         Page<Message> page = messageRepo.findByAuthorIn(channels, pageable);
         return new MessagePageDto(
                 page.getContent(),
