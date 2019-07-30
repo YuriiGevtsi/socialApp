@@ -58,7 +58,7 @@ public class ProfileController {
     }
 
     @PostMapping("change-account-status/{userId}")
-    @JsonView(Views.IdName.class)
+    @JsonView(Views.FullProfile.class)
     public User changeAccountStatus(
             @AuthenticationPrincipal User currentUser,
             @PathVariable("userId") String userId
